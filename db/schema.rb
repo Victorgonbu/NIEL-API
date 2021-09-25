@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_25_013050) do
+ActiveRecord::Schema.define(version: 2021_09_25_175752) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,6 +43,29 @@ ActiveRecord::Schema.define(version: 2021_09_25_013050) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "licenses", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "price_cents", default: 0, null: false
+    t.string "price_currency", default: "USD", null: false
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "shopping_cart_id", null: false
+    t.string "orderable_type", null: false
+    t.bigint "orderable_id", null: false
+    t.bigint "license_id", null: false
+    t.boolean "complete", default: false
+    t.string "token"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["license_id"], name: "index_orders_on_license_id"
+    t.index ["orderable_type", "orderable_id"], name: "index_orders_on_orderable"
+    t.index ["shopping_cart_id"], name: "index_orders_on_shopping_cart_id"
+  end
+
   create_table "shopping_carts", force: :cascade do |t|
     t.string "total"
     t.bigint "user_id"
@@ -64,4 +87,6 @@ ActiveRecord::Schema.define(version: 2021_09_25_013050) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "orders", "licenses"
+  add_foreign_key "orders", "shopping_carts"
 end
