@@ -16,5 +16,17 @@ RSpec.describe User, type: :model do
     it {should validate_presence_of(:password_digest)}
     it {should have_secure_password}
     it {should validate_presence_of(:country)}
+
+    describe 'validate email regex' do
+      subject {User.create(name: 'victor', email: 'email', password: 'victor', 
+        password_confirmation: 'victor', country: 'COL')}
+      it ' returns error message as json response' do
+        expect(subject.valid?).to be_falsy
+        errors = subject.errors.full_messages
+        expect(errors).to eq(['Email Invalid'])
+        subject.email = 'victor@gmaill.com'
+        expect(subject.valid?).to be_truthy
+      end
+    end
   end
 end
