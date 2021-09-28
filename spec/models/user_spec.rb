@@ -5,7 +5,8 @@ RSpec.describe User, type: :model do
     password: 'password', password_confirmation: 'password', country: 'Colombia')}
   
   describe 'associations' do 
-    it {should have_one(:shopping_cart).class_name('ShoppingCart')}
+    it {should have_many(:orders).class_name('Order')}
+    it {should have_many(:purchases).class_name('Order')}
   end
 
   describe 'validations' do

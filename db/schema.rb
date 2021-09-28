@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_25_224522) do
+ActiveRecord::Schema.define(version: 2021_09_28_194838) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,7 +70,6 @@ ActiveRecord::Schema.define(version: 2021_09_25_224522) do
   end
 
   create_table "orders", force: :cascade do |t|
-    t.bigint "shopping_cart_id", null: false
     t.string "orderable_type", null: false
     t.bigint "orderable_id", null: false
     t.bigint "license_id", null: false
@@ -78,17 +77,10 @@ ActiveRecord::Schema.define(version: 2021_09_25_224522) do
     t.string "token"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "user_id"
     t.index ["license_id"], name: "index_orders_on_license_id"
     t.index ["orderable_type", "orderable_id"], name: "index_orders_on_orderable"
-    t.index ["shopping_cart_id"], name: "index_orders_on_shopping_cart_id"
-  end
-
-  create_table "shopping_carts", force: :cascade do |t|
-    t.string "total"
-    t.bigint "user_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_shopping_carts_on_user_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
   create_table "tracks", force: :cascade do |t|
@@ -116,5 +108,5 @@ ActiveRecord::Schema.define(version: 2021_09_25_224522) do
   add_foreign_key "genre_tracks", "genres"
   add_foreign_key "genre_tracks", "tracks"
   add_foreign_key "orders", "licenses"
-  add_foreign_key "orders", "shopping_carts"
+  add_foreign_key "orders", "users"
 end

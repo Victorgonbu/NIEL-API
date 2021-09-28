@@ -4,7 +4,7 @@ class ApplicationController < ActionController::API
 
   private
   def authenticate_token!
-    payload = JsonWebToken.decode(authToken)
+    payload = JsonWebToken.decode(authToken).first
     @current_user = User.find(payload['sub'])
   rescue
     @current_user = nil
