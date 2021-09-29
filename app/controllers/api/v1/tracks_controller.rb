@@ -2,7 +2,6 @@ class Api::V1::TracksController < ApplicationController
   before_action :authenticate_user!, only: [:create, :update]
 
   def create
-    p current_user
     @track = Track.new(track_params)
     genres = params[:genres]
 
@@ -26,10 +25,11 @@ class Api::V1::TracksController < ApplicationController
   
   private
 
-  def options
+  def options(opt = {related_tracks: true})
     {
       include: [:genres], 
       params: {
+        related_tracks: opt[:related_tracks]
         user_purchases: user_purchases, 
         admin: current_user ? current_user.admin : false 
       }
@@ -38,8 +38,9 @@ class Api::V1::TracksController < ApplicationController
 
   def user_purchases
     return [] unless current_user
-    current_user.purchases.map do |purchase|
-      { orderable: purchase.orderable_id, license: purchase.license_id }
+    
+    current_user.purchases.includes(:license).map do |purchase|
+      { orderable: purchase.orderable_id, license: purchase.license.number }
     end
                       
   end

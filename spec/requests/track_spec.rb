@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Track', type: :request do
-  before(:each) {
+  before(:all) {
     @track_params = {
       genres: [1],
       track: {
@@ -29,9 +29,7 @@ RSpec.describe 'Track', type: :request do
 
       attributes =  response_json["data"]['attributes']
       expect(response).to have_http_status(200)
-      expect(attributes.keys).to include('buyable', 'name', 'bpm', 'pcm', 'relatedTracks')
-      expect(attributes['imageFile']).not_to be_empty()
-      expect(attributes['mp3File']).not_to be_empty()
+      track_have_base_attributes(attributes)
       expect(attributes['wavFile']).not_to be_empty()
       expect(attributes['zipFile']).not_to be_empty()
       expect(response_json["included"].length).to be(1)
@@ -47,15 +45,74 @@ RSpec.describe 'Track', type: :request do
       get "/api/v1/tracks/#{Track.first.id}", headers: {Authtorization: "Bearer #{authToken}"}
       attributes = response_json["data"]["attributes"]
       expect(response).to have_http_status(200)
-      expect(attributes.keys).to include('buyable', 'name', 'bpm', 'pcm', 'relatedTracks')
-      expect(attributes["imageFile"]).not_to be_empty()
-      expect(attributes["mp3File"]).not_to be_empty()
+      track_have_base_attributes(attributes)
       expect(attributes["wavFile"]).to be_falsy()
       expect(attributes["zipFile"]).to be_falsy()
     end
 
     it "return track base attributes if no user signed in" do
-      
+      get "/api/v1/tracks/#{Track.first.id}"
+      attributes = response_json["data"]["attributes"]
+      expect(response).to have_http_status(200)
+      track_have_base_attributes(attributes)
+      expect(attributes["wavFile"]).to be_falsy()
+      expect(attributes["zipFile"]).to be_falsy()
+     
     end
+
+    it "return track base attributes with mp3_file if user owns standar license" do
+      licen = License.create(name: 'standard', description: 'description', price_cents: 30, number: 1) 
+      Track.first.orders.create(license_id: License.last.id, complete: true, token: 'token', user_id: User.last.id)
+      authToken = JsonWebToken.encode(sub: User.last.id)
+      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
+      attributes = response_json["data"]["attributes"]
+      expect(response).to have_http_status(200)
+      track_have_base_attributes(attributes)
+      expect(attributes["own"]).to be_truthy()
+      expect(attributes["wavFile"]).to be_falsy()
+      expect(attributes["zipFile"]).to be_falsy()
+    end
+    it "return track base attributes with mp3_file and wavFile if user owns premium license" do
+      License.create(name: 'premium', description: 'description', price_cents: 50, number: 2)
+      Track.first.orders.create(license_id: License.last.id, complete: true, token: 'token', user_id: User.last.id)
+      authToken = JsonWebToken.encode(sub: User.last.id)
+      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
+      attributes = response_json["data"]["attributes"]
+      expect(response).to have_http_status(200)
+      track_have_base_attributes(attributes)
+      expect(attributes["own"]).to be_truthy()
+      expect(attributes["wavFile"]).not_to be_empty()
+      expect(attributes["zipFile"]).to be_falsy()
+    end
+    it "return track base attributes with mp3_file, wavFile and zipFile if user owns unlimited license" do
+      License.create(name: 'unlimited', description: 'description', price_cents: 50, number: 3)
+      Track.first.orders.create(license_id: License.last.id, complete: true, token: 'token', user_id: User.last.id)
+      authToken = JsonWebToken.encode(sub: User.last.id)
+      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
+      attributes = response_json["data"]["attributes"]
+      expect(response).to have_http_status(200)
+      track_have_base_attributes(attributes)
+      expect(attributes["own"]).to be_truthy()
+      expect(attributes["wavFile"]).not_to be_empty()
+      expect(attributes["zipFile"]).not_to be_empty()
+    end
+
+    it "return track base attributes with mp3_file, wavFile and zipFile if admin user" do
+      authToken = JsonWebToken.encode(sub: User.first.id)
+      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
+      attributes = response_json["data"]["attributes"]
+      expect(response).to have_http_status(200)
+      track_have_base_attributes(attributes)
+      expect(attributes["own"]).to be_falsy()
+      expect(attributes["wavFile"]).not_to be_empty()
+      expect(attributes["zipFile"]).not_to be_empty()
+    end
+  end
+
+  describe 'GET index' do
+    before(:each) {
+      Track.create(@track_params[:track])
+      Track.create(@track_params[:track])
+    }
   end
 end

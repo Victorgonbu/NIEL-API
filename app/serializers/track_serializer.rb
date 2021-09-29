@@ -25,7 +25,7 @@ class TrackSerializer
   end
 
   attribute :related_tracks do |track, params|
-    related_tracks(track) unless params[:no_related]
+    related_tracks(track) if params[:related_tracks]
   end
 
   attribute :created_at do |track|
@@ -89,12 +89,13 @@ class TrackSerializer
         url: zip_url(track)
       }
     elsif params[:user_purchases]
+  
       track_user_purchases = params[:user_purchases].find_all do |purchase|
         purchase[:orderable] == track.id
       end
       if track_user_purchases.length.positive?
-        higher_purchase = track_user_purchases.max { |a, b| a[:license] <=> b[:license] }
-        if higher_purchase[:license] >= 3
+        higher_license = track_user_purchases.max_by { |purchase| purchase[:license] }
+        if higher_license[:license] >= 3
           {
             url: zip_url(track)
           }
