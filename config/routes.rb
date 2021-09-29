@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       resources :users, only: [:create]
       resources :authenticate, only:[:create]
       resources :genres, only: [:index, :show]
-      resources :tracks, only: [:create]
+      resources :tracks, only: [:create, :update, :show, :index]
     end
   end
 end

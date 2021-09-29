@@ -3,7 +3,7 @@ module TrackHelper
 
   class_methods do
     def image_url(track)
-      track.image_file.variant(resize_to_limit: [330, 330]).processed.url
+      track.image_file.variant(resize_to_limit: [330, 330])
       # Rails.application.routes.url_helpers.rails_blob_path(track.image_file, only_path: true)
     end
 

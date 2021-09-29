@@ -14,11 +14,26 @@ class Api::V1::TracksController < ApplicationController
       render json: {errors: @track.errors.full_messages}, status: 422
     end
   end
+
+  def show
+    @track = Track.find(params[:id])
+    if @track.present?
+      render json: TrackSerializer.new(@track, options).serializable_hash.to_json, status: 200
+    else
+      render json: {errors: ['Not found']}, status: 404
+    end
+  end
   
   private
 
   def options
-    {include: [:genres], user_purchases: user_purchases}
+    {
+      include: [:genres], 
+      params: {
+        user_purchases: user_purchases, 
+        admin: current_user ? current_user.admin : false 
+      }
+    }
   end
 
   def user_purchases

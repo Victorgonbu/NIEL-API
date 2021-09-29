@@ -46,6 +46,7 @@ class TrackSerializer
   end
 
   attribute :mp3_file do |track, params|
+   
     if params[:admin]
       {
         blob_id: track.mp3_file.signed_id,
@@ -78,6 +79,7 @@ class TrackSerializer
         end
       end
     end
+
   end
   # license higher than 2
   attribute :zip_file do |track, params|
@@ -98,7 +100,6 @@ class TrackSerializer
           }
         end
       end
-
     end
   end
 end
