@@ -139,6 +139,7 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.12.4-x86_64-linux)
       racc (~> 1.4)
+    pagy (4.11.0)
     parallel (1.20.1)
     parser (3.0.2.0)
       ast (~> 2.4.1)
@@ -251,6 +252,7 @@ DEPENDENCIES
   jwt
   listen (~> 3.3)
   money-rails
+  pagy
   pg (~> 1.1)
   puma (~> 5.0)
   rack-cors

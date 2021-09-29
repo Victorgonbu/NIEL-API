@@ -1,4 +1,5 @@
 class Api::V1::TracksController < ApplicationController
+  include Pagy::Backend
   before_action :authenticate_user!, only: [:create, :update]
 
   def create
@@ -22,6 +23,17 @@ class Api::V1::TracksController < ApplicationController
       render json: {errors: ['Not found']}, status: 404
     end
   end
+
+  def index
+    @tracks = pagy(Track.all_tracks)
+    #.last is needed due to pagy return
+    @tracks.last
+
+    render json: 
+    TrackSerializer.new(@tracks.last, options({related_tracks: false})).serializable_hash.to_json, status: 200
+  rescue Pagy::OverflowError
+    render json: {errors: ['Not found']}, status: 404
+  end
   
   private
 
@@ -29,7 +41,7 @@ class Api::V1::TracksController < ApplicationController
     {
       include: [:genres], 
       params: {
-        related_tracks: opt[:related_tracks]
+        related_tracks: opt[:related_tracks],
         user_purchases: user_purchases, 
         admin: current_user ? current_user.admin : false 
       }

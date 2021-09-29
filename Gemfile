@@ -25,6 +25,9 @@ gem 'rubocop'
 # money-rails
 gem 'money-rails'
 
+#pagination
+gem 'pagy'
+
 # CORS
 gem 'rack-cors', require: 'rack/cors'
 

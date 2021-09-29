@@ -39,6 +39,8 @@ RSpec.describe 'Track', type: :request do
   describe 'GET show' do
     before(:each) {
       Track.create(@track_params[:track])
+      Genre.create(name: "Rock", icon: 'rock_icon')
+      GenreTrack.create(genre_id: Genre.last.id, track_id: Track.last.id)
     }
     it 'return track base attributes if no licence purchase' do
       authToken = JsonWebToken.encode(sub: User.last.id)
@@ -107,6 +109,14 @@ RSpec.describe 'Track', type: :request do
       expect(attributes["wavFile"]).not_to be_empty()
       expect(attributes["zipFile"]).not_to be_empty()
     end
+
+    it "return track list of related tracks if any" do
+        Track.create(@track_params[:track])
+        GenreTrack.create(genre_id: Genre.last.id, track_id: Track.last.id)
+        get "/api/v1/tracks/#{Track.last.id}"
+        expect(response).to have_http_status(200)
+        expect(response_json["data"]["attributes"]["relatedTracks"].length).to be(1)
+    end
   end
 
   describe 'GET index' do
@@ -114,5 +124,21 @@ RSpec.describe 'Track', type: :request do
       Track.create(@track_params[:track])
       Track.create(@track_params[:track])
     }
+    describe 'return array with all tracks' do
+      context "return data depending on page given as parameter" do
+        it 'return data of page passed is url params' do
+          get  '/api/v1/tracks/?page=1'
+          expect(response).to have_http_status(200)
+          expect(response_json["data"].length).to be(2)
+        end
+
+        it 'return error message if no data for page passed in url params' do
+          get  '/api/v1/tracks/?page=2'
+          expect(response).to have_http_status(404)
+          expect(response_json["errors"]).to eq(["Not found"])
+        end
+      end
+      
+    end
   end
 end
