@@ -16,7 +16,7 @@ RSpec.describe 'Genre' do
   describe 'GET .show' do
     it 'should return json with genre details and tracks' do 
       Genre.create(name: 'Rock', icon: 'rock_icon', slug: 'rock')
-      Track.create(name: 'track', bpm: 100, pcm: '1123', buyable: true)
+      Track.create(track_params[:track])
       GenreTrack.create(track_id: Track.first.id, genre_id: Genre.first.id)
       get "/api/v1/genres/#{Genre.first.id}"
       response_ = response_json['data']

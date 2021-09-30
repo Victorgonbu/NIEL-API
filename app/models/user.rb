@@ -5,7 +5,6 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: {case_sensitive: true},
   format: {with: REGEX, message:'Invalid'}
   validates :password_digest, presence: true, length: {minimum: 6}
-  validates :country, presence: true
 
   has_secure_password
 

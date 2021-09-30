@@ -6,7 +6,6 @@ RSpec.describe "User", type: :request do
       @user_params = {
         user: {
           name: 'victor',
-          country: 'Colombia',
           email: 'victor@hotmail.com',
           password: 'password',
           password_confirmation: 'password'

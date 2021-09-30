@@ -2,24 +2,13 @@ require 'rails_helper'
 
 RSpec.describe 'Track', type: :request do
   before(:all) {
-    @track_params = {
-      genres: [1],
-      track: {
-        name: 'track name',
-        bpm: 100,
-        pcm: '[1, 0, 3, 4]',
-        buyable: true,
-        mp3_file: Rack::Test::UploadedFile.new('app/assets/tests/mp3.mp3', 'audio/mp3'),
-        wav_file: Rack::Test::UploadedFile.new('app/assets/tests/wav.wav', 'audio/wav'),
-        image_file: Rack::Test::UploadedFile.new('app/assets/tests/image.png', 'image/png'),
-        zip_file: Rack::Test::UploadedFile.new('app/assets/tests/zip.zip', 'file/zip')
-      }
-    }
+  
     User.create(name: 'victor', email: 'victor@email.com', password: 'victor',
-    password_confirmation: 'victor', country: 'Col', admin: true)
+    password_confirmation: 'victor', admin: true)
     User.create(name: 'manuel', email: 'manuel@email.com', password: 'victor',
-      password_confirmation: 'victor', country: 'Col', admin: false)
+      password_confirmation: 'victor', admin: false)
     Genre.create(name: 'Rock', icon: 'rock_icon')
+    @track_params = track_params
   }
   describe 'POST .create' do
     it  'create track record with all its attachements' do
