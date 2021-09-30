@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       resources :authenticate, only:[:create]
       resources :genres, only: [:index, :show]
       resources :tracks, only: [:create, :update, :show, :index]
+      resources :authentication, only: [:create]
     end
   end
 end
