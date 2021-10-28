@@ -1,9 +1,13 @@
 FactoryBot.define do
   factory :order do
-    shopping_cart { nil }
     orderable { nil }
     license { nil }
     complete { false }
-    token { "MyString" }
+    user {nil}
+    token { "token" }
+  end
+
+  factory :order_complete, parent: :order do
+    complete {true}
   end
 end

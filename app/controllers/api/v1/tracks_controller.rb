@@ -5,8 +5,7 @@ class Api::V1::TracksController < ApplicationController
   def create
     @track = Track.new(track_params.except(:genres))
     genres = track_params[:genres]
-    p 'IN CONTROLLER'
-    p genres
+    
     if @track.save && !genres.empty?
       genres.each {|genre| @track.genre_tracks.create(genre_id: genre["id"])}
       render json: TrackSerializer.new(@track, options).serializable_hash.to_json, status: 200

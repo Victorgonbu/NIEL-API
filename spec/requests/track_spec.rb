@@ -11,7 +11,7 @@ RSpec.describe 'Track', type: :request, debbug: true do
     FactoryBot.create(:genre)
   end
   describe 'POST .create' do
-    it  'create track record with all its attachements', focus: true do
+    it  'create track record with all its attachements' do
       authToken = JsonWebToken.encode(sub: admin.id)
       track_attributes = {track: attributes_for(:track).merge({genres: [{id: genre.id}]})}
       post '/api/v1/tracks', params: track_attributes, headers: {Authorization: "Bearer #{authToken}"}
@@ -30,31 +30,35 @@ RSpec.describe 'Track', type: :request, debbug: true do
       #  Track.create(@track_params[:track])
       #  GenreTrack.create(genre_id: genre.id, track_id: Track.last.id)
       #}
-    it 'return track base attributes if no licence purchase' do
-      authToken = JsonWebToken.encode(sub: User.last.id)
-      get "/api/v1/tracks/#{Track.first.id}", headers: {Authtorization: "Bearer #{authToken}"}
-      attributes = response_json["data"]["attributes"]
-      expect(response).to have_http_status(200)
-      track_have_base_attributes(attributes)
-      expect(attributes["wavFile"]).to be_falsy()
-      expect(attributes["zipFile"]).to be_falsy()
-    end
 
-    it "return track base attributes if no user signed in" do
-      get "/api/v1/tracks/#{Track.first.id}"
-      attributes = response_json["data"]["attributes"]
-      expect(response).to have_http_status(200)
-      track_have_base_attributes(attributes)
-      expect(attributes["wavFile"]).to be_falsy()
-      expect(attributes["zipFile"]).to be_falsy()
-     
+    context "return track base attributes" do
+      it 'when none licence purchase' do
+        authToken = JsonWebToken.encode(sub: user.id)
+        get "/api/v1/tracks/#{track.id}", headers: {Authtorization: "Bearer #{authToken}"}
+        attributes = response_json["data"]["attributes"]
+        expect(response).to have_http_status(200)
+        track_have_base_attributes(attributes)
+        expect(attributes["wavFile"]).to be_falsy()
+        expect(attributes["zipFile"]).to be_falsy()
+      end
+  
+      it "when user signed in" do
+        get "/api/v1/tracks/#{track.id}"
+        attributes = response_json["data"]["attributes"]
+        expect(response).to have_http_status(200)
+        track_have_base_attributes(attributes)
+        expect(attributes["wavFile"]).to be_falsy()
+        expect(attributes["zipFile"]).to be_falsy()
+       
+      end
     end
-
+    
     it "return track base attributes with mp3_file if user owns standar license" do
-      licen = License.create(name: 'standard', description: 'description', price_cents: 30, number: 1) 
-      Track.first.orders.create(license_id: License.last.id, complete: true, token: 'token', user_id: User.last.id)
-      authToken = JsonWebToken.encode(sub: User.last.id)
-      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
+      licen = FactoryBot.create(:standard)
+      FactoryBot.create(:order_complete, orderable: track, license: licen, user: user)
+
+      authToken = JsonWebToken.encode(sub: user.id)
+      get "/api/v1/tracks/#{track.id}", headers: {Authorization: "Bearer #{authToken}"}
       attributes = response_json["data"]["attributes"]
       expect(response).to have_http_status(200)
       track_have_base_attributes(attributes)
@@ -63,10 +67,11 @@ RSpec.describe 'Track', type: :request, debbug: true do
       expect(attributes["zipFile"]).to be_falsy()
     end
     it "return track base attributes with mp3_file and wavFile if user owns premium license" do
-      License.create(name: 'premium', description: 'description', price_cents: 50, number: 2)
-      Track.first.orders.create(license_id: License.last.id, complete: true, token: 'token', user_id: User.last.id)
-      authToken = JsonWebToken.encode(sub: User.last.id)
-      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
+      licen = FactoryBot.create(:premium)
+      FactoryBot.create(:order_complete, orderable: track, license: licen, user: user)
+
+      authToken = JsonWebToken.encode(sub: user.id)
+      get "/api/v1/tracks/#{track.id}", headers: {Authorization: "Bearer #{authToken}"}
       attributes = response_json["data"]["attributes"]
       expect(response).to have_http_status(200)
       track_have_base_attributes(attributes)
@@ -74,43 +79,51 @@ RSpec.describe 'Track', type: :request, debbug: true do
       expect(attributes["wavFile"]).not_to be_empty()
       expect(attributes["zipFile"]).to be_falsy()
     end
-    it "return track base attributes with mp3_file, wavFile and zipFile if user owns unlimited license" do
-      License.create(name: 'unlimited', description: 'description', price_cents: 50, number: 3)
-      Track.first.orders.create(license_id: License.last.id, complete: true, token: 'token', user_id: User.last.id)
-      authToken = JsonWebToken.encode(sub: User.last.id)
-      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
-      attributes = response_json["data"]["attributes"]
-      expect(response).to have_http_status(200)
-      track_have_base_attributes(attributes)
-      expect(attributes["own"]).to be_truthy()
-      expect(attributes["wavFile"]).not_to be_empty()
-      expect(attributes["zipFile"]).not_to be_empty()
-    end
 
-    it "return track base attributes with mp3_file, wavFile and zipFile if admin user" do
-      authToken = JsonWebToken.encode(sub: admin.id)
-      get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
-      attributes = response_json["data"]["attributes"]
-      expect(response).to have_http_status(200)
-      track_have_base_attributes(attributes)
-      expect(attributes["own"]).to be_falsy()
-      expect(attributes["wavFile"]).not_to be_empty()
-      expect(attributes["zipFile"]).not_to be_empty()
+    context "return track with all base attributes and files" do
+      it "when user owns unlimited license" do
+        licen = FactoryBot.create(:unlimited)
+        FactoryBot.create(:order_complete, orderable: track, license: licen, user: user)
+        
+        authToken = JsonWebToken.encode(sub: user.id)
+        get "/api/v1/tracks/#{track.id}", headers: {Authorization: "Bearer #{authToken}"}
+        attributes = response_json["data"]["attributes"]
+        expect(response).to have_http_status(200)
+        track_have_base_attributes(attributes)
+        expect(attributes["own"]).to be_truthy()
+        expect(attributes["wavFile"]).not_to be_empty()
+        expect(attributes["zipFile"]).not_to be_empty()
+      end
+  
+      it "when admin user" do
+        authToken = JsonWebToken.encode(sub: admin.id)
+        get "/api/v1/tracks/#{track.id}", headers: {Authorization: "Bearer #{authToken}"}
+        attributes = response_json["data"]["attributes"]
+        expect(response).to have_http_status(200)
+        track_have_base_attributes(attributes)
+        expect(attributes["own"]).to be_falsy()
+        expect(attributes["wavFile"]).not_to be_empty()
+        expect(attributes["zipFile"]).not_to be_empty()
+      end
     end
+    
+    
 
     it "return track list of related tracks if any" do
-        Track.create(@track_params[:track])
-        GenreTrack.create(genre_id: Genre.id, track_id: Track.last.id)
-        get "/api/v1/tracks/#{Track.last.id}"
+        related_track = Track.create(attributes_for(:related_track))
+        GenreTrack.create(genre_id: genre.id, track_id: track.id)
+        GenreTrack.create(genre_id: genre.id, track_id: related_track.id)
+        get "/api/v1/tracks/#{track.id}"
         expect(response).to have_http_status(200)
-        expect(response_json["data"]["attributes"]["relatedTracks"].length).to be(1)
-    end
+        expect(response_json["data"]["attributes"]["relatedTracks"]["data"].length).to be(1)
+        expect(response_json["data"]["attributes"]["relatedTracks"]["data"].first["attributes"]["name"]).to eq("related track name")
+      end
   end
 
   describe 'GET index' do
     before(:each) {
-      Track.create(@track_params[:track])
-      Track.create(@track_params[:track])
+      FactoryBot.create(:track)
+      FactoryBot.create(:related_track)
     }
     describe 'return array with all tracks' do
       context "return data depending on page given as parameter" do

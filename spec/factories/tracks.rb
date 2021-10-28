@@ -9,4 +9,8 @@ FactoryBot.define do
     image_file {Rack::Test::UploadedFile.new('app/assets/tests/image.png', 'image/png')}
     zip_file {Rack::Test::UploadedFile.new('app/assets/tests/zip.zip', 'file/zip')}
   end
+
+  factory :related_track, parent: :track do
+    name {"related track name"}
+  end
 end
