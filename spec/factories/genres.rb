@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :genre do
-    name { "MyString" }
-    slug { "MyString" }
-    icon { "MyString" }
+    name { "Rock" }
+    icon { "rock_icon" }
   end
 end

@@ -1,9 +1,13 @@
 FactoryBot.define do
   factory :user do
-    name { "MyString" }
-    email { "MyString" }
-    password_hash { "MyString" }
-    country { "MyString" }
-    admin { "" }
+    name { "test user" }
+    email { "noadminuser@gmail.com" }
+    password { "password" }
+    password_confirmation { "password" }
+  end
+
+  factory :admin, parent: :user do
+    email {"adminuser@gmail.com"}
+    admin {true}
   end
 end

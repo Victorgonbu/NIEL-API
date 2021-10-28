@@ -15,15 +15,19 @@ RSpec.describe User, type: :model do
     it {should validate_presence_of(:email)}
     it {should validate_uniqueness_of(:email)}
     it {should validate_presence_of(:password_digest)}
-    it {should have_secure_password}
+    it {should validate_confirmation_of(:password)}
 
     describe 'validate email regex' do
       subject {User.create(name: 'victor', email: 'email', password: 'victor', 
         password_confirmation: 'victor')}
-      it ' returns error message as json response' do
+      it 'does not save if invalid' do
         expect(subject.valid?).to be_falsy
         errors = subject.errors.full_messages
         expect(errors).to eq(['Email Invalid'])
+        
+      end
+
+      it 'should save record when valid' do
         subject.email = 'victor@gmaill.com'
         expect(subject.valid?).to be_truthy
       end

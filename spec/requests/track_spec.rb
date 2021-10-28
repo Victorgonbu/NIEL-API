@@ -1,21 +1,20 @@
 require 'rails_helper'
 
-RSpec.describe 'Track', type: :request do
-  before(:all) {
-  
-    User.create(name: 'victor', email: 'victor@email.com', password: 'victor',
-    password_confirmation: 'victor', admin: true)
-    User.create(name: 'manuel', email: 'manuel@email.com', password: 'victor',
-      password_confirmation: 'victor', admin: false)
-    Genre.create(name: 'Rock', icon: 'rock_icon')
-    @track_params = track_params
-  }
+RSpec.describe 'Track', type: :request, debbug: true do
+  let!(:admin) do
+    FactoryBot.create(:admin)
+  end
+  let!(:user) do
+    FactoryBot.create(:user)
+  end
+  let!(:genre) do
+    FactoryBot.create(:genre)
+  end
   describe 'POST .create' do
-    it  'create track record with all its attachements' do
-      
-      authToken = JsonWebToken.encode(sub: User.first.id)
-      post '/api/v1/tracks', params: @track_params, headers: {Authorization: "Bearer #{authToken}"}
-
+    it  'create track record with all its attachements', focus: true do
+      authToken = JsonWebToken.encode(sub: admin.id)
+      track_attributes = {track: attributes_for(:track).merge({genres: [{id: genre.id}]})}
+      post '/api/v1/tracks', params: track_attributes, headers: {Authorization: "Bearer #{authToken}"}
       attributes =  response_json["data"]['attributes']
       expect(response).to have_http_status(200)
       track_have_base_attributes(attributes)
@@ -26,11 +25,11 @@ RSpec.describe 'Track', type: :request do
   end
 
   describe 'GET show' do
-    before(:each) {
-      Track.create(@track_params[:track])
-      Genre.create(name: "Rock", icon: 'rock_icon')
-      GenreTrack.create(genre_id: Genre.last.id, track_id: Track.last.id)
-    }
+    let!(:track) { FactoryBot.create(:track) }
+      #before(:each) {
+      #  Track.create(@track_params[:track])
+      #  GenreTrack.create(genre_id: genre.id, track_id: Track.last.id)
+      #}
     it 'return track base attributes if no licence purchase' do
       authToken = JsonWebToken.encode(sub: User.last.id)
       get "/api/v1/tracks/#{Track.first.id}", headers: {Authtorization: "Bearer #{authToken}"}
@@ -89,7 +88,7 @@ RSpec.describe 'Track', type: :request do
     end
 
     it "return track base attributes with mp3_file, wavFile and zipFile if admin user" do
-      authToken = JsonWebToken.encode(sub: User.first.id)
+      authToken = JsonWebToken.encode(sub: admin.id)
       get "/api/v1/tracks/#{Track.first.id}", headers: {Authorization: "Bearer #{authToken}"}
       attributes = response_json["data"]["attributes"]
       expect(response).to have_http_status(200)
@@ -101,7 +100,7 @@ RSpec.describe 'Track', type: :request do
 
     it "return track list of related tracks if any" do
         Track.create(@track_params[:track])
-        GenreTrack.create(genre_id: Genre.last.id, track_id: Track.last.id)
+        GenreTrack.create(genre_id: Genre.id, track_id: Track.last.id)
         get "/api/v1/tracks/#{Track.last.id}"
         expect(response).to have_http_status(200)
         expect(response_json["data"]["attributes"]["relatedTracks"].length).to be(1)
