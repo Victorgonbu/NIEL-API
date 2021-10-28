@@ -10,4 +10,9 @@ FactoryBot.define do
     email {"adminuser@gmail.com"}
     admin {true}
   end
+
+  factory :invalid_user, parent: :user do
+    name { "i" }
+    email { "invalidemail" }
+  end
 end
