@@ -5,3 +5,14 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+# GENRES
+
+names = ['reggaeton', 'hip-hop', 'rap', 'bachata', 'afrobeat', '']
+
+names.each do |name|
+  record = Genre.new(name: name, icon: 'none')
+  if record.valid?
+    record.save
+  end
+end

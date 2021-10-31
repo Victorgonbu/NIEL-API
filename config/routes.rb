@@ -6,8 +6,12 @@ Rails.application.routes.draw do
       resources :indexes, only: [:index]
       resources :users, only: [:create]
       resources :authenticate, only:[:create]
-      resources :genres, only: [:index, :show]
-      resources :tracks, only: [:create, :update, :show, :index]
+      resources :genres, only: [:index, :show], param: :slug do
+        resources :tracks, only: [:show, :index]
+      end
+
+      resources :tracks, only: [:create, :update]
+      
       resources :authentication, only: [:create]
     end
   end
