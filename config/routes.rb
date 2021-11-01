@@ -9,7 +9,7 @@ Rails.application.routes.draw do
       resources :genres, only: [:index, :show], param: :slug 
 
       resources :tracks, only: [:create, :update, :show, :index]
-      
+      resources :licenses, only: [:create, :show, :index, :update]
       resources :authentication, only: [:create]
     end
   end
