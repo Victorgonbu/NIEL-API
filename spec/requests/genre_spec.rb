@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Genre' do
+RSpec.describe 'Genre', debug: true do
   describe 'GET .index' do
     it 'should return array with all current genres' do
       FactoryBot.create(:genre)
@@ -19,8 +19,7 @@ RSpec.describe 'Genre' do
       genre = FactoryBot.create(:genre)
       track = FactoryBot.create(:track)
       GenreTrack.create(track_id: track.id, genre_id: genre.id)
-      
-      get "/api/v1/genres/#{genre.id}"
+      get "/api/v1/genres/#{genre.slug}"
       response_ = response_json['data']
       expect(response_['attributes']).to have_key('name')
       expect(response_['attributes']).to have_key('slug')

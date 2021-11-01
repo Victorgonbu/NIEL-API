@@ -6,7 +6,7 @@ class Api::V1::GenresController < ApplicationController
   end
 
   def show
-    @genre = Genre.find(params[:id])
+    @genre = Genre.find_by_slug(params[:slug])
     if @genre.present?
       render json: GenreSerializer.new(@genre, options).serializable_hash.to_json, status: 200
     end
