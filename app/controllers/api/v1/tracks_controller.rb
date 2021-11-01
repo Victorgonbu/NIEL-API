@@ -1,6 +1,5 @@
 class Api::V1::TracksController < ApplicationController
   include Pagy::Backend
-  before_action :set_tracks, only: [:index]
   before_action :authenticate_user!, only: [:create, :update]
 
   def create
@@ -26,7 +25,7 @@ class Api::V1::TracksController < ApplicationController
   end
 
   def index
-    @tracks = pagy(@tracks)
+    @tracks = pagy(Track.all_tracks)
     #.last is needed due to pagy return
     @tracks.last
 
@@ -56,12 +55,6 @@ class Api::V1::TracksController < ApplicationController
       { orderable: purchase.orderable_id, license: purchase.license.number }
     end
                       
-  end
-
-  def set_tracks
-    @tracks = params[:genre_slug] == 'all' ? Track.all_tracks : Genre.tracks(params[:genre_slug])
-  rescue ActiveRecord::RecordNotFound
-    render json: {message: "genre not found"}, status: 404
   end
 
   def track_params
