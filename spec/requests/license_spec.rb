@@ -17,7 +17,12 @@ describe 'License', type: :request, debug: true do
 
       get '/api/v1/licenses'
       debugger
-      expect(response_json["data"])
+      expect(response_json["data"].length).to be(3)
+      expect(response_json["data"][0]["attributes"]["name"]).to eq("License name")
+      expect(response_json["data"][0]["attributes"]["description"]).to eq("License description")
+      expect(response_json["data"][0]["attributes"]["number"]).to eq(1)
+      expect(response_json["data"][0]["attributes"]["price_cents"]).to eq(30)
+      expect(response_json["data"][0]["relationships"]).to have_key("orders")
     end
   end
 end
