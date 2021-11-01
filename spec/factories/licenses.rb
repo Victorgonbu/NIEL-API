@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :license do
     name { "License name" }
     description { "License description" }
+    files {"mp3"}
     price_cents { 30 }
   end
 
