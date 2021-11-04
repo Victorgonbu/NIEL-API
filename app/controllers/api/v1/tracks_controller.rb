@@ -24,13 +24,17 @@ class Api::V1::TracksController < ApplicationController
     end
   end
 
-  def index
-    @tracks = pagy(Track.all_tracks)
+  def index 
+    @tracks = params[:genre] ? Genre.tracks_by(params[:genre]) : Track.all_tracks
+    
+    @tracks = pagy(@tracks)
     #.last is needed due to pagy return
     @tracks.last
 
     render json: 
     TrackSerializer.new(@tracks.last, options({related_tracks: false})).serializable_hash.to_json, status: 200
+  rescue ActiveRecord::RecordNotFound
+    render json: {message: 'genre not found'}, status: 404
   rescue Pagy::OverflowError
     render json: {errors: ['Not found']}, status: 404
   end

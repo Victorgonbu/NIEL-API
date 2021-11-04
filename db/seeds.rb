@@ -32,4 +32,18 @@
 #  end
 #end
 
-License.create(name: 'Standard', description: )
+track = Track.new(name: "track sample", bpm: 12, pcm: '[]')
+if track.save
+  track.genre_tracks.create(genre_id: Genre.first.id)
+
+  track.image_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/image.png')), filename: 'image.png')
+  track.mp3_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/mp3.mp3')), filename: 'mp3.mp3')
+  track.zip_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/zip.zip')), filename: 'zip.zip')
+  track.wav_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/wav.wav')), filename: 'wav.wav')
+end
+
+#LICENSES
+#License.create(name: 'Standard', description: 'Cannot be registered, Cannot be monetized', files: ".Mp3-file", price_cents: 29, number: 1)
+#License.create(name: 'Premium', description: 'Cannot be registered, Cannot be monetized', files: ".Mp3-file, .Wav-file", price_cents: 49, number: 2)
+#License.create(name: 'Unlimited', description: "Acquire beat's rights, Can be registered, Can be monetized", files: ".Mp3-file, .Wav-file, Stems", price_cents: 99, number: 3)
+#License.create(name: 'Custom', description: "Acquire beat's rights, Can be registered, Can be monetized", files: "Custom-beat, .Mp3-file, .Wav-file, Stems", price_cents: 199, number: 4)

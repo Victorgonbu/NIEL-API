@@ -10,7 +10,7 @@ RSpec.describe 'Track', type: :request, debbug: true do
   let!(:genre) do
     FactoryBot.create(:genre)
   end
-  describe 'POST .create' do
+  describe 'POST .create', debug: true do
     it  'create track record with all its attachements' do
       authToken = JsonWebToken.encode(sub: admin.id)
       track_attributes = {track: attributes_for(:track).merge({genres: [{id: genre.id}]})}
@@ -122,24 +122,64 @@ RSpec.describe 'Track', type: :request, debbug: true do
 
   describe 'GET index' do
     before(:each) {
-      FactoryBot.create(:track)
-      FactoryBot.create(:related_track)
+      track = FactoryBot.create(:track)
+      relalted_track = FactoryBot.create(:related_track)
+      genre_two = FactoryBot.create(:genre, name: "salsa")
     }
-    describe 'return array with all tracks' do
-      context "return data depending on page given as parameter" do
-        it 'return data of page passed is url params' do
+    describe 'return array with tracks' do
+      context "return array all tracks" do
+        it 'return tracks by page passed is url params' do
           get  '/api/v1/tracks/?page=1'
           expect(response).to have_http_status(200)
           expect(response_json["data"].length).to be(2)
         end
 
-        it 'return error message if no data for page passed in url params' do
+        it 'return error message if page passed in url params contains no tracks' do
           get  '/api/v1/tracks/?page=2'
           expect(response).to have_http_status(404)
           expect(response_json["errors"]).to eq(["Not found"])
         end
       end
+
+      context 'return tracks by genre' do
+        before(:each) {
+          FactoryBot.create(:genre_track, track: Track.first, genre: Genre.first)
+          FactoryBot.create(:genre_track, track: Track.last, genre: Genre.last)
+        }
+        context 'reggaeton' do
+          it 'return tracks by page passed in url params' do
+            
+            get  '/api/v1/tracks?genre=rock&page=1'
+            
+            expect(response).to have_http_status(200)
+            expect(response_json["data"].length).to be(1)
+          end
+          it 'return error message if page passed in url contains no tracks' do
+            get  '/api/v1/tracks?genre=rock&page=2'
+            expect(response).to have_http_status(404)
+            expect(response_json["errors"]).to eq(["Not found"])
+          end
+        end
+
+        context 'salsa' do
+          it 'return tracks by page passed in url params' do
+            get  '/api/v1/tracks?genre=salsa&page=1'
+            expect(response).to have_http_status(200)
+            expect(response_json["data"].length).to be(1)
+          end
+          it 'return error message if page passed in url contains no tracks' do
+            get  '/api/v1/tracks?genre=salsa&page=2'
+            expect(response).to have_http_status(404)
+            expect(response_json["errors"]).to eq(["Not found"])
+          end
+        end
+        
+
+        
+      end
       
     end
+
+    
   end
 end
