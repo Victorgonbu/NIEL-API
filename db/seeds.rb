@@ -32,9 +32,10 @@
 #  end
 #end
 
-track = Track.new(name: "track sample", bpm: 12, pcm: '[]')
+track = Track.new(name: "track with large title | trueno type beat", bpm: 12, pcm: '[]')
 if track.save
-  track.genre_tracks.create(genre_id: Genre.first.id)
+  track.genre_tracks.create(genre_id: Genre.fourth.id)
+  track.genre_tracks.create(genre_id: Genre.fifth.id)
 
   track.image_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/image.png')), filename: 'image.png')
   track.mp3_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/mp3.mp3')), filename: 'mp3.mp3')

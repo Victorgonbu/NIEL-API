@@ -3,7 +3,9 @@ class TrackSerializer
   include TrackHelper
   set_key_transform :camel_lower
   attributes :name, :bpm, :buyable
-  has_many :genres
+  has_many :genres, meta: (Proc.new do |track_record|
+    track_record.genres
+  end)
   
 
   attribute :own do |track, params|
