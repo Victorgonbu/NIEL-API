@@ -10,6 +10,16 @@ FactoryBot.define do
     zip_file {Rack::Test::UploadedFile.new('app/assets/tests/zip.zip', 'file/zip')}
   end
 
+  factory :track_with_genres, parent: :track do
+    name {'track with genre assciations'}
+    after(:create) do |track|
+      first_genre = create(:genre)
+      second_genre = create(:genre, name: 'Afrobeat')
+      create(:genre_track, track: track, genre: first_genre)
+      create(:genre_track, track: track, genre: second_genre)
+    end
+  end
+
   factory :related_track, parent: :track do
     name {"related track name"}
   end

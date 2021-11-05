@@ -26,8 +26,7 @@ class Api::V1::TracksController < ApplicationController
 
   def index 
     genres = params[:genres].try(:split, ',')
-    p 'GENRES GENRES'
-    p genres
+
     @tracks = genres ? Track.by_genre(genres) : Track.all_tracks
     
     @tracks = pagy(@tracks)
