@@ -13,4 +13,10 @@ class Track < ApplicationRecord
       wav_file_attachment: :blob, zip_file_attachment: :blob)
     }
 
+  scope :by_genre, -> (genres_slug) {
+    left_outer_joins(:genres).where(genres: {slug: genres_slug}).order(created_at: :desc)
+    .includes(:genres, image_file_attachment: :blob, mp3_file_attachment: :blob,
+      wav_file_attachment: :blob, zip_file_attachment: :blob).distinct
+  }
+
 end

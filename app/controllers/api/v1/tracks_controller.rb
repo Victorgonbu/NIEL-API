@@ -25,7 +25,10 @@ class Api::V1::TracksController < ApplicationController
   end
 
   def index 
-    @tracks = params[:genre] ? Genre.tracks_by(params[:genre]) : Track.all_tracks
+    genres = params[:genres].try(:split, ',')
+    p 'GENRES GENRES'
+    p genres
+    @tracks = genres ? Track.by_genre(genres) : Track.all_tracks
     
     @tracks = pagy(@tracks)
     #.last is needed due to pagy return
@@ -43,7 +46,6 @@ class Api::V1::TracksController < ApplicationController
 
   def options(opt = {related_tracks: true})
     {
-      include: [:genres], 
       params: {
         related_tracks: opt[:related_tracks],
         user_purchases: user_purchases, 
