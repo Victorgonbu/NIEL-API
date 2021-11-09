@@ -25,13 +25,12 @@ class Api::V1::TracksController < ApplicationController
   end
 
   def index 
-    genres = params[:genres].try(:split, ',')
+    genres = params[:genres].try(:split, ';')
 
     @tracks = genres ? Track.by_genre(genres) : Track.all_tracks
     
     @tracks = pagy(@tracks)
     #.last is needed due to pagy return
-    @tracks.last
 
     render json: 
     TrackSerializer.new(@tracks.last, options({related_tracks: false})).serializable_hash.to_json, status: 200
