@@ -32,10 +32,21 @@
 #  end
 #end
 
-track = Track.new(name: "track with large title | trueno type beat", bpm: 12, pcm: '[]')
+track = Track.new(name: "chamucho rompe kukos | trueno type beat", bpm: 12, pcm: '[]')
 if track.save
-  track.genre_tracks.create(genre_id: Genre.fourth.id)
   track.genre_tracks.create(genre_id: Genre.fifth.id)
+  track.genre_tracks.create(genre_id: Genre.second.id)
+
+  track.image_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/image.png')), filename: 'image.png')
+  track.mp3_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/mp3.mp3')), filename: 'mp3.mp3')
+  track.zip_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/zip.zip')), filename: 'zip.zip')
+  track.wav_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/wav.wav')), filename: 'wav.wav')
+end
+
+track = Track.new(name: "los caramelos que le meten nitioo", bpm: 12, pcm: '[]')
+if track.save
+  track.genre_tracks.create(genre_id: Genre.third.id)
+  track.genre_tracks.create(genre_id: Genre.fourth.id)
 
   track.image_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/image.png')), filename: 'image.png')
   track.mp3_file.attach(io: File.open(File.join(Rails.root,'app/assets/tests/mp3.mp3')), filename: 'mp3.mp3')
