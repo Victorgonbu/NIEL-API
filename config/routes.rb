@@ -11,6 +11,9 @@ Rails.application.routes.draw do
       resources :tracks, only: [:create, :update, :show, :index]
       resources :licenses, only: [:create, :show, :index, :update]
       resources :authentication, only: [:create]
+
+      resource :direct_upload, only: [:create, :destroy]
+
     end
   end
 end

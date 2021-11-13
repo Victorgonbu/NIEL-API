@@ -12,4 +12,8 @@ class ApplicationController < ActionController::API
   def authToken
     @authToken ||= request.headers.fetch('Authorization', '').split.last
   end
+
+  def authenticate_admin!
+    render json: {errors: ['No valid user']}, status: 400 unless current_user.try(:admin)
+  end
 end

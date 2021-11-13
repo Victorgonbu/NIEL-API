@@ -1,6 +1,6 @@
 class Api::V1::TracksController < ApplicationController
   include Pagy::Backend
-  before_action :authenticate_user!, only: [:create, :update]
+  before_action :authenticate_admin!, only: [:create, :update]
 
   def create
     @track = Track.new(track_params.except(:genres))
@@ -25,8 +25,7 @@ class Api::V1::TracksController < ApplicationController
   end
 
   def index 
-    genres = params[:genres].try(:split, ';')
-
+    genres = params[:genres].try(:split, ',')
     @tracks = genres ? Track.by_genre(genres) : Track.all_tracks
     
     @tracks = pagy(@tracks)
@@ -65,7 +64,5 @@ class Api::V1::TracksController < ApplicationController
     params.require(:track).permit(:name, :bpm, :pcm, :buyable, :mp3_file, :zip_file, :wav_file, :image_file, 
       genres: [:id])
   end
-  def authenticate_user!
-    render json: {errors: ['No valid user']}, status: 400 unless current_user && current_user.admin
-  end
+  
 end

@@ -197,8 +197,6 @@ RSpec.describe 'Track', type: :request, debbug: true do
           end
         end
         
-
-        
       end
       
     end
