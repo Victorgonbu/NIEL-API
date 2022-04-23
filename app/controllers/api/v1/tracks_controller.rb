@@ -48,7 +48,7 @@ class Api::V1::TracksController < ApplicationController
     return [] unless current_user
     
     current_user.purchases.includes(:license).map do |purchase|
-      { orderable: purchase.orderable_id, license: purchase.license.number }
+      { orderable: purchase.orderable_id, license: purchase.license.uuid }
     end
                       
   end

@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :license do
     name { Faker::Lorem.sentence }
     privileges { [Faker::Lorem.word, Faker::Lorem.word] }
-    files { [Faker::lorem.word, Faler::Lorem.word] }
+    files { [Faker::Lorem.word, Faker::Lorem.word] }
     price_cents { 30 }
   end
 

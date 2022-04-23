@@ -10,42 +10,39 @@ RSpec.describe 'Track', type: :request do
       it  'create track record with all its attachements' do
         track_attributes = { track: attributes_for(:track).merge(genre_tracks_attributes: genres.map { |genre| {genre_id: genre.id} }) }
         post '/api/v1/tracks', params: track_attributes, headers: build_auth_header(admin)
-        attributes =  response_json["data"]['attributes']
-
+        attributes =  response_json[:data][:attributes]
         expect(response).to have_http_status(201)
         track_have_base_attributes(attributes)
-        expect(attributes['wavFile']).not_to be_empty()
-        expect(attributes['zipFile']).not_to be_empty()
-        expect(response_json["data"]["relationships"]["genres"]["meta"].count).to be(2)
+        expect(attributes[:wavFile]).not_to be_empty()
+        expect(attributes[:zipFile]).not_to be_empty()
+        expect(response_json[:data][:relationships][:genres][:meta].count).to be(2)
       end
     end
   end
 
   describe 'GET show' do
-    let!(:track) { FactoryBot.create(:track_with_genres) }
-    
+    let(:track) { create(:track_with_genres) }
 
     context "return track base attributes" do
-
       it 'when none licence purchase' do
         get "/api/v1/tracks/#{track.id}", headers: build_auth_header(user)
-        attributes = response_json["data"]["attributes"]
+        attributes = response_json[:data][:attributes]
     
         expect(response).to have_http_status(200)
         track_have_base_attributes(attributes)
-        expect(attributes["wavFile"]).to be_falsy()
-        expect(attributes["zipFile"]).to be_falsy()
-        expect(response_json["data"]["relationships"]["genres"]["meta"].length).to be(2)
+        expect(attributes[:wavFile]).to be_falsy()
+        expect(attributes[:zipfile]).to be_falsy()
+        expect(response_json[:data][:relationships][:genres][:meta].length).to be(2)
       end
   
       it "when user not signed in" do
         get "/api/v1/tracks/#{track.id}"
-        attributes = response_json["data"]["attributes"]
+        attributes = response_json[:data][:attributes]
         expect(response).to have_http_status(200)
         track_have_base_attributes(attributes)
-        expect(attributes["wavFile"]).to be_falsy()
-        expect(attributes["zipFile"]).to be_falsy()
-        expect(response_json["data"]["relationships"]["genres"]["meta"].length).to be(2)
+        expect(attributes[:wavFile]).to be_falsy()
+        expect(attributes[:zipfile]).to be_falsy()
+        expect(response_json[:data][:relationships][:genres][:meta].length).to be(2)
       end
     end
 
@@ -56,14 +53,14 @@ RSpec.describe 'Track', type: :request do
 
       it "when valid" do
         get "/api/v1/tracks/#{track.id}", headers: build_auth_header(user)
-        attributes = response_json["data"]["attributes"]
+        attributes = response_json[:data][:attributes]
         track_have_base_attributes(attributes)
   
         expect(response).to have_http_status(200)
-        expect(attributes["own"]).to be_truthy()
-        expect(attributes["wavFile"]).to be_falsy()
-        expect(attributes["zipFile"]).to be_falsy()
-        expect(response_json["data"]["relationships"]["genres"]["meta"].length).to be(2)
+        expect(attributes[:own]).to be_truthy()
+        expect(attributes[:wavFile]).to be_falsy()
+        expect(attributes[:zipFile]).to be_falsy()
+        expect(response_json[:data][:relationships][:genres][:meta].length).to be(2)
       end
     end
 
@@ -74,14 +71,14 @@ RSpec.describe 'Track', type: :request do
 
       it 'when valid' do
         get "/api/v1/tracks/#{track.id}", headers: build_auth_header(user)
-        attributes = response_json["data"]["attributes"]
+        attributes = response_json[:data][:attributes]
 
         expect(response).to have_http_status(200)
         track_have_base_attributes(attributes)
-        expect(attributes["own"]).to be_truthy()
-        expect(attributes["wavFile"]).not_to be_empty()
-        expect(attributes["zipFile"]).to be_falsy()
-        expect(response_json["data"]["relationships"]["genres"]["meta"].length).to be(2)
+        expect(attributes[:own]).to be_truthy()
+        expect(attributes[:wavFile]).not_to be_empty()
+        expect(attributes[:zipFile]).to be_falsy()
+        expect(response_json[:data][:relationships][:genres][:meta].length).to be(2)
       end
     end
 
@@ -92,26 +89,26 @@ RSpec.describe 'Track', type: :request do
 
       it "when user owns unlimited license" do      
         get "/api/v1/tracks/#{track.id}", headers: build_auth_header(user)
-        attributes = response_json["data"]["attributes"]
+        attributes = response_json[:data][:attributes]
 
         expect(response).to have_http_status(200)
         track_have_base_attributes(attributes)
-        expect(attributes["own"]).to be_truthy()
-        expect(attributes["wavFile"]).not_to be_empty()
-        expect(attributes["zipFile"]).not_to be_empty()
-        expect(response_json["data"]["relationships"]["genres"]["meta"].length).to be(2)
+        expect(attributes[:own]).to be_truthy()
+        expect(attributes[:wavFile]).not_to be_empty()
+        expect(attributes[:zipFile]).not_to be_empty()
+        expect(response_json[:data][:relationships][:genres][:meta].length).to be(2)
       end
   
       it "when admin user" do
         get "/api/v1/tracks/#{track.id}", headers: build_auth_header(admin)
-        attributes = response_json["data"]["attributes"]
+        attributes = response_json[:data][:attributes]
 
         expect(response).to have_http_status(200)
         track_have_base_attributes(attributes)
-        expect(attributes["own"]).to be_falsy()
-        expect(attributes["wavFile"]).not_to be_empty()
-        expect(attributes["zipFile"]).not_to be_empty()
-        expect(response_json["data"]["relationships"]["genres"]["meta"].length).to be(2)
+        expect(attributes[:own]).to be_falsy()
+        expect(attributes[:wavFile]).not_to be_empty()
+        expect(attributes[:zipFile]).not_to be_empty()
+        expect(response_json[:data][:relationships][:genres][:meta].length).to be(2)
       end
     end
 
@@ -123,9 +120,10 @@ RSpec.describe 'Track', type: :request do
 
       it "if list with any related track" do
         get "/api/v1/tracks/#{track.id}"
+        related_tracks_data = response_json[:data][:attributes][:relatedTracks][:data]
         expect(response).to have_http_status(200)
-        expect(response_json["data"]["attributes"]["relatedTracks"]["data"].length).to be(1)
-        expect(response_json["data"]["attributes"]["relatedTracks"]["data"].first["attributes"]["name"]).to eq("related track name")
+        expect(related_tracks_data.length).to be(1)
+        expect(related_tracks_data.first[:attributes][:name]).to eq("related track name")
       end
     end
   end
@@ -179,7 +177,7 @@ RSpec.describe 'Track', type: :request do
           it 'return error message if page passed in url contains no tracks' do
             get  '/api/v1/tracks?genres=salsa,rock&page=2'
             expect(response).to have_http_status(404)
-            expect(response_json["errors"]).to eq(["Not found"])
+            expect(response_json[:errors]).to eq(["Not found"])
           end
         end
       end
