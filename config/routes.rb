@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  default_url_options :host => "localhost:3000"
   namespace :api, defaults: {format: :json}, path: '/api' do
     namespace :v1, defaults: {format: :json}, path: '/v1' do
       root to: 'indexes#index' 

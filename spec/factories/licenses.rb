@@ -1,22 +1,22 @@
 FactoryBot.define do
   factory :license do
-    name { "License name" }
-    description { "License description" }
-    files {"mp3"}
+    name { Faker::Lorem.sentence }
+    privileges { [Faker::Lorem.word, Faker::Lorem.word] }
+    files { [Faker::Lorem.word, Faker::Lorem.word] }
     price_cents { 30 }
   end
 
   factory :standard, parent: :license do 
-    number {1}
+    uuid { 1 }
   end
 
   factory :premium, parent: :license do
     price_cents { 50 }
-    number {2}
+    uuid { 2 }
   end
 
   factory :unlimited, parent: :license do
     price_cents { 100 }
-    number {3}
+    uuid { 3 }
   end
 end

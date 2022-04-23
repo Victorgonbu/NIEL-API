@@ -11,6 +11,8 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
+  config.autoloader = :classic
+
   # Show full error reports.
   config.consider_all_requests_local = true
 
@@ -38,7 +40,7 @@ Rails.application.configure do
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
-  config.action_mailer.default_url_options = { :host => "localhost:8080" }
+  config.action_mailer.default_url_options = { :host => "localhost:3000" }
 
   # Raise exceptions for disallowed deprecations.
   config.active_support.disallowed_deprecation = :raise

@@ -1,0 +1,19 @@
+en:
+  model:
+    license:
+      title:
+        standard: Standard
+        premium: Premium
+        unlimited: Unlimited
+        custom: Custom
+      privileges:
+        cant_be_registered: Can't be registered
+        cant_be_monetized: Can't be monetized
+        beat_rights: Acquire beat's rights
+        can_be_registered: Can be registered
+        can_be_monetized: Can be monetized
+      files:
+        mp3_file: MP3 file
+        wav_file: WAV file
+        stems: Stems
+        custom_beat: Custom Beat

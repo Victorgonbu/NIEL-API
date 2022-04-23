@@ -1,45 +1,38 @@
 class Api::V1::TracksController < ApplicationController
-  include Pagy::Backend
-  before_action :authenticate_admin!, only: [:create, :update]
+  
+  #before_action :authenticate_admin!, only: [:create, :update]
 
   def create
-    @track = Track.new(track_params.except(:genres))
-    genres = track_params[:genres]
-    
-    if @track.save && !genres.empty?
-      genres.each {|genre| @track.genre_tracks.create(genre_id: genre["id"])}
-      render json: TrackSerializer.new(@track, options).serializable_hash.to_json, status: 200
+    initialize_render_concern(create_track_interactor, :output, options)
 
-    else
-      render json: {errors: @track.errors.full_messages}, status: 422
-    end
+    render_result_serializer
   end
 
   def show
-    @track = Track.find(params[:id])
-    if @track.present?
-      render json: TrackSerializer.new(@track, options).serializable_hash.to_json, status: 200
-    else
-      render json: {errors: ['Not found']}, status: 404
-    end
+    initialize_render_concern(show_track_interactor, :output, options)
+
+    render_result_serializer
   end
 
   def index 
-    genres = params[:genres].try(:split, ',')
-    @tracks = genres ? Track.by_genre(genres) : Track.all_tracks
-    
-    @tracks = pagy(@tracks)
-    #.last is needed due to pagy return
+    initialize_render_concern(index_track_interactor, :output, options({related_tracks: false}))
 
-    render json: 
-    TrackSerializer.new(@tracks.last, options({related_tracks: false})).serializable_hash.to_json, status: 200
-  rescue ActiveRecord::RecordNotFound
-    render json: {message: 'genre not found'}, status: 404
-  rescue Pagy::OverflowError
-    render json: {errors: ['Not found']}, status: 404
+    render_result_serializer(index: true)
   end
   
   private
+  
+  def create_track_interactor
+    TrackInteractor::Create.call(track_params: track_params)
+  end
+
+  def show_track_interactor
+    TrackInteractor::Show.call(id: params[:id])
+  end
+  
+  def index_track_interactor
+    TrackInteractor::Index.call(params: params)
+  end
 
   def options(opt = {related_tracks: true})
     {
@@ -51,18 +44,29 @@ class Api::V1::TracksController < ApplicationController
     }
   end
 
-  def user_purchases
+  def user_purchases  
     return [] unless current_user
     
     current_user.purchases.includes(:license).map do |purchase|
-      { orderable: purchase.orderable_id, license: purchase.license.number }
+      { orderable: purchase.orderable_id, license: purchase.license.uuid }
     end
                       
   end
 
   def track_params
-    params.require(:track).permit(:name, :bpm, :pcm, :buyable, :mp3_file, :zip_file, :wav_file, :image_file, 
-      genres: [:id])
+    params.require(:track).permit(
+      :name, 
+      :bpm, 
+      :pcm, 
+      :buyable, 
+      :mp3_file, 
+      :zip_file, 
+      :wav_file, 
+      :image_file, 
+      genre_tracks_attributes: [
+        :genre_id
+      ]
+    )
   end
   
 end
