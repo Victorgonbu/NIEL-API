@@ -8,6 +8,8 @@ class Track < ApplicationRecord
   has_many :orders, as: :orderable, dependent: :destroy
   has_many :purchases, ->{where complete: true}, as: :orderable, class_name: 'Order', dependent: :destroy
   
+  accepts_nested_attributes_for :genre_tracks, allow_destroy: true
+
   scope :all_tracks, -> {order(created_at: :desc)
     .includes(:genres, image_file_attachment: :blob, mp3_file_attachment: :blob,
       wav_file_attachment: :blob, zip_file_attachment: :blob)
@@ -18,5 +20,4 @@ class Track < ApplicationRecord
     .includes(:genres, image_file_attachment: :blob, mp3_file_attachment: :blob,
       wav_file_attachment: :blob, zip_file_attachment: :blob).distinct
   }
-
 end

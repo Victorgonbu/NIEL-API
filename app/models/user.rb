@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   include BCrypt
   REGEX = URI::MailTo::EMAIL_REGEXP
-  validates :name, presence: true, length: {minimum: 6, maximum: 20}
+  validates :name, presence: true, length: {minimum: 6, maximum: 30}
   validates :email, presence: true, uniqueness: {case_sensitive: true},
   format: {with: REGEX, message:'Invalid'}
   validates :password, presence: true, confirmation: true

@@ -1,12 +1,24 @@
 module RequestHelpers
   def response_json
-    JSON.parse(response.body)
+    @response_json ||= JSON.parse(response.body).with_indifferent_access
+  end
+
+  def index_result_json
+    response_json[:results][:data]
   end
 
   def track_have_base_attributes(attributes)
     expect(attributes.keys).to include('buyable', 'name', 'bpm', 'pcm', 'relatedTracks')
     expect(attributes['imageFile']).not_to be_empty()
     expect(attributes['mp3File']).not_to be_empty()
+  end
+
+  def build_auth_header(user)
+    {Authorization: "Bearer #{auth_token_mock(user)}"}
+  end
+
+  def auth_token_mock(user)
+    @auth_token_mock ||= JsonWebToken.encode(sub: user.id)
   end
 #
   #def track_params

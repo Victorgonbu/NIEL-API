@@ -19,6 +19,9 @@ gem 'bcrypt', '~> 3.1.7'
 # aws s3
 gem 'aws-sdk-s3'
 
+# interactors
+gem "interactor", "~> 3.0"
+
 # rubocop
 gem 'rubocop'
 
@@ -56,6 +59,7 @@ group :development, :test do
   gem 'shoulda-matchers'
   gem 'factory_bot_rails'
   gem 'database_cleaner-active_record'
+  gem 'faker'
 end
 
 group :development do
