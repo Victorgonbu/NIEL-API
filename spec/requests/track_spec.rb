@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Track', type: :request, focus: true do
+RSpec.describe 'Track', type: :request do
   let!(:admin) { create(:admin) }
   let!(:user) { create(:user) }
   let!(:genres)  { create_list(:genre, 2) }

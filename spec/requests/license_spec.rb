@@ -12,7 +12,7 @@ describe 'License', type: :request, debug: true do
     FactoryBot.create(:unlimited)
   end
   
-  describe 'GET index' do
+  describe 'GET index', focus: true do
     it 'should return all licenses' do
 
       get '/api/v1/licenses'
